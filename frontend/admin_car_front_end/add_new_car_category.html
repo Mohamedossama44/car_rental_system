@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../../frontend/css/nav_css.css">
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../frontend/nav_jss/nav.js"></script>
+    <link rel='stylesheet' href='../../node_modules/@fortawesome/fontawesome-free/css/all.min.css'>
+    <link rel="stylesheet" href="../../frontend/nav_jss/navbar-pure-css/dist/style.css">
+    <link rel="stylesheet" href="../css/col_navbar.css">
+
+    <title>Add category</title>
+</head>
+
+<body>
+    <div class="flex-container">
+
+        <div id="nav-bar">
+            <input id="nav-toggle" type="checkbox" />
+            <div id="nav-header"><a id="nav-title" target="_blank"><i></i>Admin System</a>
+                <label for="nav-toggle"><span id="nav-toggle-burger"></span></label>
+                <hr />
+            </div>
+            <div id="nav-content">
+                <div class="nav-button"><i class="fas fa-home"></i><span><a
+                            href="../admin_dashboard/admin_dashboard.html">Home</a></span></div>
+                <div class="nav-button"><i class="fas fa-car"></i><span><a
+                            href="../admin_car_front_end/add_new_car.html">Add
+                            Car</a></span></div>
+                <div class="nav-button"><i class="fas fa-thumbtack"></i><span><a href="#">Add Office</a></span></div>
+
+                <div class="nav-button"><i class="fas fa-bookmark"></i><span><a
+                            href="../admin_car_front_end/add_new_car_category.html">Add Category</a></span></div>
+                <hr />
+
+
+                <div class="nav-button"><i class="fas fa-bookmark"></i><span><a
+                            href="../admin_dashboard/admin_reports/car_reservation_report2.html">Reservation car
+                            info</a></span></div>
+
+                <div class="nav-button"><i class="fas fa-search"></i><span><a
+                            href="../admin_dashboard/admin_reports/car_reservation_report.html">Reservation customer
+                            info</a></span></div>
+
+                <div class="nav-button"><i class="fas fa-search"></i><span><a
+                            href="../admin_dashboard/admin_reports/cars_status.html">cars status</a></span></div>
+
+                <div class="nav-button"><i class="fas fa-chart-line"></i><span><a
+                            href="../admin_dashboard/admin_reports/reservations_specific_customer.html">reservations
+                            specific
+                            customer</a></span></div>
+                <div class="nav-button"><i class="fas fa-money-bill"></i><span><a
+                            href="../admin_dashboard/admin_reports/daily_payments.html">daily payments</a></span></div>
+                <div class="nav-button"><i class="fas fa-thumbtack"></i><span><a href="../../backend/logout/logout.php">
+                            log out</a></span></div>
+                <div id="nav-content-highlight"></div>
+            </div>
+        </div>
+
+        <div class="content-of-page">
+
+            <div class="container mt-4 text-start">
+                <!-- Add a div for success message -->
+
+                <h3>Add new Car Category</h3>
+                <form id="CategoryForm" action="" method="POST" enctype='multipart/form-data'>
+                    <div class="mb-3 text-start">
+                        <label for="barnd" class="form-label">Brand</label>
+                        <input type="text" class="form-control" id="brand" name="brand">
+                        <div class="invalid-feedback">Please enter the barnd.</div>
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label for="carName" class="form-label">Car Name</label>
+                        <input type="text" class="form-control" id="carName" name="carName">
+                        <div class="invalid-feedback">Please enter the car Name.</div>
+                    </div>
+
+                    <div id="successMessage" class="text-success p-2"></div>
+                    <hr>
+                    <button type="submit" class="btn btn-primary w-100 p-3 mb-5">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $('#CategoryForm').submit(function (e) {
+                    e.preventDefault(); // prevent the form from submitting traditionally
+
+                    // Remove previous validation styles
+                    $('.is-invalid').removeClass('is-invalid');
+
+                    // Clear previous success message
+                    $('#successMessage').empty();
+
+                    // Check if input fields are empty
+                    var formValid = true;
+
+                    $('#CategoryForm input').each(function () {
+                        console.log($(this).val())
+                        if ($(this).val().trim() === '') {
+                            $(this).addClass('is-invalid');
+                            formValid = false;
+                        }
+                    });
+
+                    if (!formValid) {
+                        return;
+                    }
+
+                    // Get form data
+                    var formData = $(this).serialize();
+                    // Send the data using AJAX
+                    $.ajax({
+                        type: 'POST',
+                        url: 'http://localhost/final_db_admin/backend/admin_car_controller/add_new_category.php', // Replace with the actual file path
+                        data: formData,
+                        success: function (response) {
+                            // Handle success
+                            if (response === 'false') {
+                                $('#carName').addClass('is-invalid');
+                                $('#carName').next('.invalid-feedback').text('This car already exists');
+                            } else {
+                                // Display success message
+                                $('#successMessage').text('Record inserted successfully').addClass('text-success');
+                                console.log(response);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle errors
+                            console.error(xhr.responseText);
+
+                            // Display validation errors
+                            var errors = JSON.parse(xhr.responseText);
+                            $.each(errors, function (key, value) {
+                                $('#' + key).addClass('is-invalid');
+                                $('#' + key).next('.invalid-feedback').text(value);
+                            });
+
+                            alert('Error: ' + xhr.responseText);
+                        }
+                    });
+                });
+            });
+        </script>
+
+</body>
+
+</html>
